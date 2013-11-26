@@ -153,6 +153,23 @@ class FilesTest(test.BaseTest):
         thumb = self.ext_thumbnailer.get_thumbnail({'size': (100, 100)})
         self.assertEqual(path.splitext(thumb.name)[1], '.jpg')
 
+    def test_skip_transparent_if_jpeg(self):
+        """
+        If the extension is jpg or jpeg, transparent should be forced to false
+        """
+        thumb = self.ext_thumbnailer.get_thumbnail_name({'size': (500, 500)},
+                                                        transparent=True)
+        file_path, source_filename = path.split(thumb)
+        source_extension = path.splitext(source_filename)[1][1:]
+        self.assertEqual(source_extension, 'jpg')
+
+        thumbnailer = files.get_thumbnailer(self.storage, 'test.jpeg')
+        thumb = thumbnailer.get_thumbnail_name({'size': (500, 500)},
+                                                        transparent=True)
+        file_path, source_filename = path.split(thumb)
+        source_extension = path.splitext(source_filename)[1][1:]
+        self.assertEqual(source_extension, 'jpg')
+
     def test_high_resolution(self):
         self.ext_thumbnailer.thumbnail_high_resolution = True
         thumb = self.ext_thumbnailer.get_thumbnail({'size': (100, 100)})

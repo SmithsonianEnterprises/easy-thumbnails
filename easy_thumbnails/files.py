@@ -324,6 +324,11 @@ class Thumbnailer(File):
         """
         path, source_filename = os.path.split(self.name)
         source_extension = os.path.splitext(source_filename)[1][1:]
+
+        # If the source image is a jpeg, force transparent to false
+        if source_extension in ('jpg', 'jpeg'):
+            transparent = False
+
         filename = '%s%s' % (self.thumbnail_prefix, source_filename)
         preserve_extensions = self.thumbnail_preserve_extensions
         if preserve_extensions and (
