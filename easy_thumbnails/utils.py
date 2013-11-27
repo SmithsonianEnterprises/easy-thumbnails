@@ -135,7 +135,7 @@ def get_modified_time(storage, name):
         modified_time = storage.modified_time(name)
     except OSError:
         return 0
-    except NotImplementedError:
+    except (NotImplementedError, AttributeError):
         return None
     if modified_time and timezone.is_naive(modified_time):
         if getattr(settings, 'USE_TZ', False):
