@@ -444,10 +444,6 @@ class Thumbnailer(File):
         thumbnail values for future lookups.
         """
         filename = thumbnail.name
-        try:
-            self.thumbnail_storage.delete(filename)
-        except Exception:
-            pass
         self.thumbnail_storage.save(filename, thumbnail)
         signals.thumbnail_created.send(sender=thumbnail)
         self.get_thumbnail_cache(thumbnail.name, create=True, update=True)
