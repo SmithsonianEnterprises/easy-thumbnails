@@ -8,7 +8,7 @@ from django.utils.html import escape
 from easy_thumbnails import utils
 from easy_thumbnails.alias import aliases
 from easy_thumbnails.conf import settings
-from easy_thumbnails.files import get_thumbnailer
+from easy_thumbnails.files import get_thumbnailer, ThumbnailFile
 
 register = Library()
 
@@ -273,7 +273,15 @@ def thumbnail_url(source, alias):
         <img href="{{ person.photo|thumbnail_url:'small' }}" alt="">
     """
     try:
-        thumb = get_thumbnailer(source)[alias]
+        #
+        # Implementation changed to avoid looking up source files
+        #
+        thumbnailer = get_thumbnailer(source)
+        options = aliases.get(alias)
+        filename = thumbnailer.get_thumbnail_name(options)
+        thumb = ThumbnailFile(
+            name=filename, storage=thumbnailer.thumbnail_storage,
+            thumbnail_options=options)
     except Exception:
         return ''
     return thumb.url
