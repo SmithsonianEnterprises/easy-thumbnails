@@ -278,6 +278,9 @@ def thumbnail_url(source, alias):
         #
         thumbnailer = get_thumbnailer(source)
         options = aliases.get(alias)
+        # Hack to add support for django-filer's "subject_location" capability
+        if getattr(source, 'subject_location', False):
+            options['subject_location'] = source.subject_location
         filename = thumbnailer.get_thumbnail_name(options)
         thumb = ThumbnailFile(
             name=filename, storage=thumbnailer.thumbnail_storage,
