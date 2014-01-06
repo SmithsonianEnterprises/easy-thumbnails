@@ -1,3 +1,4 @@
+import copy
 import re
 import six
 
@@ -277,7 +278,7 @@ def thumbnail_url(source, alias):
         # Implementation changed to avoid looking up source files
         #
         thumbnailer = get_thumbnailer(source)
-        options = aliases.get(alias).copy()
+        options = copy.deepcopy(aliases.get(alias))
         # Hack to add support for django-filer's "subject_location" capability
         if getattr(source, 'subject_location', False):
             options['subject_location'] = source.subject_location
