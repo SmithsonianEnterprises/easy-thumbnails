@@ -285,7 +285,8 @@ def thumbnail_url(source, alias):
         elif options.get('subject_location', False):
             # Failsafe. Never add subject_location if it's not needed for this image
             del options['subject_location']
-        filename = thumbnailer.get_thumbnail_name(options)
+        filename = thumbnailer.get_thumbnail_name(options,
+                                                  transparent=utils.is_transparent(source))
         thumb = ThumbnailFile(
             name=filename, storage=thumbnailer.thumbnail_storage,
             thumbnail_options=options)
