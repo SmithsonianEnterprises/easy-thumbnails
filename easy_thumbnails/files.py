@@ -491,9 +491,12 @@ class Thumbnailer(File):
         if hasattr(self, '_source_cache') and not update:
             if self._source_cache or not create:
                 return self._source_cache
-        update_modified = self.get_source_modtime()
+
+        update_modified = None
         if update:
+            update_modified = self.get_source_modtime()
             update_modified = update_modified or timezone.now()
+
         self._source_cache = models.Source.objects.get_file(
             create=create, update_modified=update_modified,
             storage=self.source_storage, name=self.name,
@@ -503,8 +506,9 @@ class Thumbnailer(File):
     def get_thumbnail_cache(self, thumbnail_name, create=False, update=False):
         if self.remote_source:
             return None
-        update_modified = self.get_thumbnail_modtime(thumbnail_name)
+        update_modified = None
         if update:
+            update_modified = self.get_thumbnail_modtime(thumbnail_name)
             update_modified = update_modified or timezone.now()
         source = self.get_source_cache(create=True)
         return models.Thumbnail.objects.get_file(

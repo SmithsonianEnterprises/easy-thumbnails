@@ -277,19 +277,20 @@ def thumbnail_url(source, alias):
         #
         # Implementation changed to avoid looking up source files
         #
-        thumbnailer = get_thumbnailer(source)
-        options = copy.deepcopy(aliases.get(alias))
-        # Hack to add support for django-filer's "subject_location" capability
-        if getattr(source, 'subject_location', False):
-            options['subject_location'] = source.subject_location
-        elif options.get('subject_location', False):
-            # Failsafe. Never add subject_location if it's not needed for this image
-            del options['subject_location']
-        filename = thumbnailer.get_thumbnail_name(
-            options, transparent=utils.is_transparent(source))
-        thumb = ThumbnailFile(
-            name=filename, storage=thumbnailer.thumbnail_storage,
-            thumbnail_options=options)
+        # thumbnailer = get_thumbnailer(source)
+        # options = copy.deepcopy(aliases.get(alias))
+        # # Hack to add support for django-filer's "subject_location" capability
+        # if getattr(source, 'subject_location', False):
+        #     options['subject_location'] = source.subject_location
+        # elif options.get('subject_location', False):
+        #     # Failsafe. Never add subject_location if it's not needed for this image
+        #     del options['subject_location']
+        # filename = thumbnailer.get_thumbnail_name(
+        #     options, transparent=utils.is_transparent(source))
+        # thumb = ThumbnailFile(
+        #     name=filename, storage=thumbnailer.thumbnail_storage,
+        #     thumbnail_options=options)
+        thumb = get_thumbnailer(source)[alias]
     except Exception:
         return ''
 
