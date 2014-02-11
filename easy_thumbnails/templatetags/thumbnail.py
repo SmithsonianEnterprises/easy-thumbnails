@@ -290,11 +290,22 @@ def thumbnail_url(source, alias):
         # thumb = ThumbnailFile(
         #     name=filename, storage=thumbnailer.thumbnail_storage,
         #     thumbnail_options=options)
-        thumb = get_thumbnailer(source)[alias]
+        thumbnailer = get_thumbnailer(source)
+        options = copy.deepcopy(aliases.get(alias))
+        if not options:
+            return ''
+
+        # Hack to add support for django-filer's "subject_location" capability
+        if getattr(source, 'subject_location', False):
+            options['subject_location'] = source.subject_location
+        elif options.get('subject_location', False):
+            # Failsafe. Never add subject_location if it's not needed for this image
+            del options['subject_location']
+
     except Exception:
         return ''
 
-    return thumb.url
+    return thumbnailer.get_thumbnail(options).url
 
 
 register.tag(thumbnail)

@@ -286,6 +286,7 @@ class Thumbnailer(File):
             orig_size = thumbnail_options['size']  # remember original size
             thumbnail_options = thumbnail_options.copy()
             thumbnail_options['size'] = (orig_size[0] * 2, orig_size[1] * 2)
+
         image = self.generate_source_image(thumbnail_options)
         if image is None:
             raise exceptions.InvalidImageFormatError(
