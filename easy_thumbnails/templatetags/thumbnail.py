@@ -301,11 +301,10 @@ def thumbnail_url(source, alias):
         elif options.get('subject_location', False):
             # Failsafe. Never add subject_location if it's not needed for this image
             del options['subject_location']
-
+        return thumbnailer.get_thumbnail(options).url
     except Exception:
         return ''
 
-    return thumbnailer.get_thumbnail(options).url
 
 
 register.tag(thumbnail)
