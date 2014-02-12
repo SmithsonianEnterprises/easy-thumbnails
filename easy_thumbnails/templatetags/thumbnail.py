@@ -1,6 +1,7 @@
 import copy
 import re
 import six
+import logging
 
 from django.template import (
     Library, Node, VariableDoesNotExist, TemplateSyntaxError)
@@ -9,7 +10,7 @@ from django.utils.html import escape
 from easy_thumbnails import utils
 from easy_thumbnails.alias import aliases
 from easy_thumbnails.conf import settings
-from easy_thumbnails.files import get_thumbnailer, ThumbnailFile
+from easy_thumbnails.files import get_thumbnailer
 
 register = Library()
 
@@ -17,6 +18,8 @@ RE_SIZE = re.compile(r'(\d+)x(\d+)$')
 
 VALID_OPTIONS = utils.valid_processor_options()
 VALID_OPTIONS.remove('size')
+
+logger = logging.getLogger(__name__)
 
 
 def split_args(args):
@@ -302,7 +305,9 @@ def thumbnail_url(source, alias):
             # Failsafe. Never add subject_location if it's not needed for this image
             del options['subject_location']
         return thumbnailer.get_thumbnail(options).url
-    except Exception:
+    except Exception as err:
+        logger.debug('Error generating the url for {}, {}', source, alias)
+        logger.exception(err)
         return ''
 
 
