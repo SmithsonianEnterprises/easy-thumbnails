@@ -381,6 +381,11 @@ class Thumbnailer(File):
         """
         path, source_filename = os.path.split(self.name)
         source_extension = os.path.splitext(source_filename)[1][1:]
+
+        # If the source image is a jpeg, force transparent to false
+        if source_extension in ('jpg', 'jpeg'):
+            transparent = False
+
         filename = '%s%s' % (self.thumbnail_prefix, source_filename)
         preserve_extensions = self.thumbnail_preserve_extensions
         if preserve_extensions and (
@@ -515,10 +520,6 @@ class Thumbnailer(File):
         thumbnail values and dimensions for future lookups.
         """
         filename = thumbnail.name
-        try:
-            self.thumbnail_storage.delete(filename)
-        except Exception:
-            pass
         self.thumbnail_storage.save(filename, thumbnail)
 
         thumb_cache = self.get_thumbnail_cache(
@@ -585,7 +586,9 @@ class Thumbnailer(File):
         if hasattr(self, '_source_cache') and not update:
             if self._source_cache or not create:
                 return self._source_cache
+
         update_modified = (update or create) and timezone.now()
+
         self._source_cache = models.Source.objects.get_file(
             create=create, update_modified=update_modified,
             storage=self.source_storage, name=self.name,
@@ -595,6 +598,7 @@ class Thumbnailer(File):
     def get_thumbnail_cache(self, thumbnail_name, create=False, update=False):
         if self.remote_source:
             return None
+
         source = self.get_source_cache(create=True)
         update_modified = (update or create) and timezone.now()
         return models.Thumbnail.objects.get_file(

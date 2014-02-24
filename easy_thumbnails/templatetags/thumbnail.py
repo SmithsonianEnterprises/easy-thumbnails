@@ -1,4 +1,6 @@
 import re
+import logging
+
 from django.utils import six
 
 from django.template import (
@@ -16,6 +18,8 @@ RE_SIZE = re.compile(r'(\d+)x(\d+)$')
 
 VALID_OPTIONS = utils.valid_processor_options()
 VALID_OPTIONS.remove('size')
+
+logger = logging.getLogger(__name__)
 
 
 def split_args(args):
