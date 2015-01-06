@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
 
@@ -11,17 +12,29 @@ class FileManager(models.Manager):
                  check_cache_miss=False, **kwargs):
         kwargs.update(dict(storage_hash=utils.get_storage_hash(storage),
                            name=name))
+        cache_key = u'file:{name}:site-{site}:storage_hash-{storage_hash}'.format(
+            site=getattr(settings, 'SITE_ID', None), **kwargs
+        )
         if create:
             if update_modified:
                 defaults = kwargs.setdefault('defaults', {})
                 defaults['modified'] = update_modified
-            obj, created = self.get_or_create(**kwargs)
+
+            obj, created = cache.get(cache_key, None), False
+            if not obj:
+                obj, created = self.get_or_create(**kwargs)
+                cache.set(cache_key, obj)
+
         else:
             created = False
             kwargs.pop('defaults', None)
             try:
                 manager = self._get_thumbnail_manager()
-                obj = manager.get(**kwargs)
+
+                obj = cache.get(cache_key, None)
+                if not obj:
+                    obj = manager.get(**kwargs)
+                    cache.set(cache_key, obj)
             except self.model.DoesNotExist:
 
                 if check_cache_miss and storage.exists(name):
