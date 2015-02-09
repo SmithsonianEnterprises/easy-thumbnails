@@ -1,4 +1,5 @@
 from django.core.cache import cache
+from django.utils.text import slugify
 import os
 from django.utils import six
 
@@ -105,8 +106,8 @@ def database_get_image_dimensions(file, close=False, dimensions=None):
     dimensions = None
     dimensions_cache = None
     try:
-        cache_key = u'thumbnail:{name}:site-{site}:storage_hash-{storage_hash}'.format(
-            site=getattr(settings, 'SITE_ID', None), name=file.name, storage_hash=storage_hash)
+        cache_key = u'thumbnail:{name}:{site}:{storage_hash}'.format(
+            site=getattr(settings, 'SITE_ID', None), name=slugify(file.name), storage_hash=storage_hash)
         thumbnail= cache.get(cache_key, None)
         if not thumbnail:
             thumbnail = models.Thumbnail.objects.select_related('dimensions').get(

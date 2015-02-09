@@ -1,19 +1,19 @@
 from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 
 from easy_thumbnails import utils, signal_handlers
 from easy_thumbnails.conf import settings
 
 
 class FileManager(models.Manager):
-
     def get_file(self, storage, name, create=False, update_modified=None,
                  check_cache_miss=False, **kwargs):
         kwargs.update(dict(storage_hash=utils.get_storage_hash(storage),
                            name=name))
-        cache_key = u'file:{name}:site-{site}:storage_hash-{storage_hash}'.format(
-            site=getattr(settings, 'SITE_ID', None), **kwargs
+        cache_key = u'file:{name}:{site}:{storage_hash}'.format(
+            site=getattr(settings, 'SITE_ID', None), name=slugify(name), storage_hash=kwargs.get('storage_hash')
         )
         if create:
             if update_modified:
